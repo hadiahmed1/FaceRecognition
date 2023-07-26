@@ -6,6 +6,8 @@ import Rank from './components/Rank/Rank';
 import ParticlesBg from 'particles-bg';
 import { Component } from 'react';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
+import SignInForm from './components/SignInForm/SignInForm';
+import RegistrationForm from './components/RegistrationForm/RegistrationForm';
 import React from 'react';
 
 const ClarifaiJSON=(imgurl)=>{
@@ -13,7 +15,6 @@ const ClarifaiJSON=(imgurl)=>{
     const USER_ID = 'hadiahmed';       
     const APP_ID = 'FaceDetection';
     const IMAGE_URL = imgurl;
-
     const raw = JSON.stringify({
       "user_app_id": {
           "user_id": USER_ID,
@@ -46,6 +47,7 @@ class App extends Component{
       input:'',
       imgurl:'',
       box:{},
+      route:'signin',
     }
   }
   calculateFaceLocation=(data)=>{
@@ -74,21 +76,34 @@ class App extends Component{
     .then(boxObj=>this.displayFaceBox(boxObj))
         .catch(error => console.log('error', error));
   }
+  onRouteChange=(next)=>{
+    this.setState({route:next});
+  }
   render(){ 
     return (
       <div className="App">
-        <Navigation/>
-        <Logo/>
-        <Rank/>
-        <ImageLinkForm 
-        onInputChange={this.onInputChange}
-        onButtonSubmit={this.onButtonSubmit}
-        />
-        <FaceRecognition box={this.state.box} imgurl={this.state.imgurl}/> 
+        
+        {this.state.route==='signin'
+        ? <SignInForm onRouteChange={this.onRouteChange}/>
+        :(this.state.route==='home'
+          ?<div>
+            <Navigation onRouteChange={this.onRouteChange}/>
+            <Logo/>
+            <Rank/>
+            <ImageLinkForm 
+            onInputChange={this.onInputChange}
+            onButtonSubmit={this.onButtonSubmit}
+            />
+            <FaceRecognition box={this.state.box} imgurl={this.state.imgurl}/> 
+          </div>
+          :<RegistrationForm/>
+        )
+        }
         <>
           <div>...</div>
           <ParticlesBg type="cobweb" bg={true} />
-        </>        
+        </>  
+              
       </div>
     );
   }
