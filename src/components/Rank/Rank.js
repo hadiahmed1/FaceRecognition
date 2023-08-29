@@ -3,7 +3,7 @@ const Rank=()=>{
     return(
         <div>
             <div className="white f3">
-            {"Rank= #5"}
+            {"Total entries=="}
             </div>
         </div>
     );
