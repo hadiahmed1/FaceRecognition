@@ -52,14 +52,15 @@ class App extends Component{
         id:'',
         name:'',
         email:'',
-        entries:'',
+        entries:0,
         joined:''
       }
     }
   }
   loadUser=(data)=>{
+    console.log("loadUser");
     this.setState({user: {
-      id:data.id,
+        id:data.id,
         name:data.name,
         email:data.email,
         entries:data.entries,
@@ -84,12 +85,31 @@ class App extends Component{
   onInputChange=(event)=>{
     this.setState({input:event.target.value});
   }
+
   onButtonSubmit=(event)=>{
     this.setState({imgurl:this.state.input});
     fetch("https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs",ClarifaiJSON(this.state.input))
     .then(response=>response.json())    
-    .then(result => this.calculateFaceLocation(result))
-    .then(boxObj=>this.displayFaceBox(boxObj))
+    .then(response => {
+
+      if(response){
+        console.log(this.state.user)//
+        fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          })
+            .then(response => response.json())
+            .then(count => {
+              console.log("Count="+count)//
+              this.setState(Object.assign(this.state.user, { entries: count}))
+            })
+      }
+
+      this.displayFaceBox(this.calculateFaceLocation(response))
+    })
         .catch(error => console.log('error', error));
   }
   onRouteChange=(next)=>{
@@ -100,12 +120,12 @@ class App extends Component{
       <div className="App">
         
         {this.state.route==='signin'
-        ? <SignInForm onRouteChange={this.onRouteChange}/>
+        ? <SignInForm loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
         :(this.state.route==='home'
           ?<div>
             <Navigation onRouteChange={this.onRouteChange}/>
             <Logo/>
-            <Rank/>
+            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
             <ImageLinkForm 
             onInputChange={this.onInputChange}
             onButtonSubmit={this.onButtonSubmit}

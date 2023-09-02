@@ -23,10 +23,12 @@ class SignInForm extends React.Component{
                 password:this.state.signInPassword
             })
         }).then(response=>response.json())
-            .then(data=>{
-                if(data === "Success"){
+            .then(user=>{
+                if(user.id){
                     this.props.onRouteChange('home');
+                    this.props.loadUser(user);
                     console.log("Successfull Login")
+                    
                 }else{
                     console.log("Can't loggin");
                 }
