@@ -28,8 +28,13 @@ class RegistrationForm extends React.Component{
             })
         }).then(response=>response.json())
             .then(user=>{
-                    this.props.loadUser(user);
-                    this.props.onRouteChange('home');
+                console.log(user)
+                    if(user==="Can't Register"){
+                        console.log("Can't Register");
+                    }else{
+                        this.props.loadUser(user);
+                        this.props.onRouteChange('home');
+                    }
             })
         
     }
