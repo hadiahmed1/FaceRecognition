@@ -1,13 +1,9 @@
 import './App.css';
-import Navigation from './components/Navigation/Navigation';
 import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
-import Rank from './components/Rank/Rank';
 import ParticlesBg from 'particles-bg';
 import { Component } from 'react';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
-import SignInForm from './components/SignInForm/SignInForm';
-import RegistrationForm from './components/RegistrationForm/RegistrationForm';
 import React from 'react';
 
 const ClarifaiJSON=(imgurl)=>{
@@ -40,22 +36,23 @@ const ClarifaiJSON=(imgurl)=>{
   };
 return requestOptions;
 }
+const initialState={
+  input:'',
+  imgurl:'',
+  box:{},
+  route:'signin',
+  user:{
+    id:'',
+    name:'',
+    email:'',
+    entries:0,
+    joined:''
+  }
+}
 class App extends Component{
   constructor(){
     super();
-    this.state={
-      input:'',
-      imgurl:'',
-      box:{},
-      route:'signin',
-      user:{
-        id:'',
-        name:'',
-        email:'',
-        entries:0,
-        joined:''
-      }
-    }
+    this.state=initialState;
   }
   loadUser=(data)=>{
     console.log("loadUser");
@@ -91,7 +88,6 @@ class App extends Component{
     fetch("https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs",ClarifaiJSON(this.state.input))
     .then(response=>response.json())    
     .then(response => {
-
       if(response){
         console.log(this.state.user)//
         fetch('http://localhost:3000/image', {
@@ -114,25 +110,22 @@ class App extends Component{
   }
   onRouteChange=(next)=>{
     this.setState({route:next});
+    // if(this.state.route==='signin'){
+    //   this.setState(initialState)
+    // }
   }
   render(){ 
     return (
       <div className="App">
         
-        {this.state.route==='signin'
-        ? <SignInForm loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-        :(this.state.route==='home'
-          ?<div>
-            <Navigation onRouteChange={this.onRouteChange}/>
+        {(<div>
             <Logo/>
-            <Rank name={this.state.user.name} entries={this.state.user.entries}/>
             <ImageLinkForm 
             onInputChange={this.onInputChange}
             onButtonSubmit={this.onButtonSubmit}
             />
             <FaceRecognition box={this.state.box} imgurl={this.state.imgurl}/> 
           </div>
-          :<RegistrationForm loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
         )
         }
         <>
